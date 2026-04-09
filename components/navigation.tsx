@@ -204,15 +204,15 @@ export function Navigation() {
 							<SheetTitle className="flex items-center gap-3">
 								<div className="w-12 h-12 rounded-full overflow-hidden bg-sidebar-primary/10 flex items-center justify-center">
 									<Image 
-										src="/public/logo.webp" 
-										alt="People Manager Logo" 
+										src="/founders-club-logo.svg" 
+										alt="Founders Club Logo" 
 										width={48} 
 										height={48} 
 										className="w-full h-full object-cover rounded-full"
 									/>
 								</div>
 								<div className="text-lg text-sidebar-foreground font-medium">
-									PEOPLE MANAGER CRM
+									FOUNDERS CLUB CRM
 								</div>
 							</SheetTitle>
 						</SheetHeader>
@@ -291,8 +291,8 @@ export function Navigation() {
 				<Link href="/" className="flex items-center gap-2">
 					<div className="w-10 h-10 rounded-full overflow-hidden bg-sidebar-primary/10 flex items-center justify-center">
 						<Image 
-							src="/public/logo.webp" 
-							alt="People Manager Logo" 
+							src="/founders-club-logo.svg" 
+							alt="Founders Club Logo" 
 							width={32} 
 							height={32} 
 							className="w-full h-full object-cover rounded-full"
@@ -318,15 +318,15 @@ export function Navigation() {
 					<Link href="/" className="flex flex-col items-center gap-2 text-center hover:text-sidebar-primary transition-colors">
 						<div className="w-20 h-20 rounded-full overflow-hidden bg-sidebar-primary/10 flex items-center justify-center">
 							<Image 
-								src="/public/logo.webp" 
-								alt="People Manager Logo" 
+								src="/founders-club-logo.svg" 
+								alt="Founders Club Logo" 
 								width={56} 
 								height={56} 
 								className="w-full h-full object-cover rounded-full"
 							/>
 						</div>
 						<div className="text-xl text-sidebar-foreground font-medium text-center">
-							PEOPLE MANAGER CRM
+							FOUNDERS CLUB CRM
 						</div>
 					</Link>
 				</div>
