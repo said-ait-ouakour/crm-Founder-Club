@@ -1,0 +1,1783 @@
+{
+	"info": {
+		"_postman_id": "crm-pm-api-collection",
+		"name": "CRM People Manager (crm-PM) API",
+		"description": "Complete API collection for the CRM People Manager Next.js application.\n\nThis collection covers all API routes under `app/api/**/route.ts` for the crm-PM (crm-people-manager) app, which uses Supabase for data and authentication.\n\n## Setup\n1. Set `baseUrl` to your running Next.js dev server (default: http://localhost:3001)\n2. Set `supabaseUrl` and `supabaseAnonKey` from your Supabase project\n3. Obtain an `authToken` via Supabase auth and set it in collection variables\n4. Fill in resource IDs (`userId`, `leadId`, `candidateId`, `conversationId`) as needed",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3001",
+			"type": "string"
+		},
+		{
+			"key": "supabaseUrl",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "supabaseAnonKey",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "leadId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "candidateId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "conversationId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"description": "Supabase authentication endpoints for email OTP verification and OAuth PKCE exchange.",
+			"item": [
+				{
+					"name": "Confirm Email OTP",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/confirm?token_hash=abc123def456&type=email",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "confirm"],
+							"query": [
+								{
+									"key": "token_hash",
+									"value": "abc123def456",
+									"description": "The OTP token hash from the email link"
+								},
+								{
+									"key": "type",
+									"value": "email",
+									"description": "Verification type (e.g. email, sms)"
+								}
+							]
+						},
+						"description": "Verify a Supabase email OTP token. Redirects the user after successful verification."
+					}
+				},
+				{
+					"name": "OAuth Callback (PKCE)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/callback?code=pkce_auth_code_here&next=/dashboard",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "callback"],
+							"query": [
+								{
+									"key": "code",
+									"value": "pkce_auth_code_here",
+									"description": "OAuth PKCE authorization code"
+								},
+								{
+									"key": "next",
+									"value": "/dashboard",
+									"description": "URL to redirect to after successful auth"
+								}
+							]
+						},
+						"description": "OAuth PKCE code exchange callback. Exchanges the authorization code for a session and redirects to the `next` URL."
+					}
+				}
+			]
+		},
+		{
+			"name": "Users & Access",
+			"description": "User management endpoints: listing, tab-lega users, access control, and deactivation.",
+			"item": [
+				{
+					"name": "List Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users"]
+						},
+						"description": "Retrieve a list of all users in the CRM system."
+					}
+				},
+				{
+					"name": "Tab-Lega Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/tab-lega",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "tab-lega"]
+						},
+						"description": "Retrieve users associated with the Tab-Lega section."
+					}
+				},
+				{
+					"name": "Toggle User Access",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{userId}}\",\n  \"accessGranted\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/update-access",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "update-access"]
+						},
+						"description": "Toggle access for a specific user. Set `accessGranted` to `true` to grant access or `false` to revoke it."
+					}
+				},
+				{
+					"name": "Deactivate User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{userId}}\",\n  \"employeeName\": \"John Doe\",\n  \"employeeEmail\": \"john.doe@company.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/deactivate",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "deactivate"]
+						},
+						"description": "Deactivate a user account. Optionally include `employeeName` and `employeeEmail` for audit logging."
+					}
+				}
+			]
+		},
+		{
+			"name": "WebSocket",
+			"description": "WebSocket connection management for real-time features.",
+			"item": [
+				{
+					"name": "WebSocket Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/websocket",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "websocket"]
+						},
+						"description": "Check the current status of the WebSocket service."
+					}
+				},
+				{
+					"name": "WebSocket Connect/Disconnect",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{userId}}\",\n  \"leadId\": \"{{leadId}}\",\n  \"action\": \"connect\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/websocket",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "websocket"]
+						},
+						"description": "Connect or disconnect a WebSocket session. Set `action` to `connect` or `disconnect`. Optionally scope the connection to a specific `leadId`."
+					}
+				}
+			]
+		},
+		{
+			"name": "Unipile (LinkedIn)",
+			"description": "LinkedIn integration via Unipile: status checks, authentication, disconnection, and OAuth callbacks.",
+			"item": [
+				{
+					"name": "LinkedIn Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/unipile/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "unipile", "status"]
+						},
+						"description": "Check the current LinkedIn integration status via Unipile."
+					}
+				},
+				{
+					"name": "Start LinkedIn Auth",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/unipile/connect",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "unipile", "connect"]
+						},
+						"description": "Initiate LinkedIn authentication flow through Unipile."
+					}
+				},
+				{
+					"name": "Disconnect LinkedIn",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/unipile/disconnect",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "unipile", "disconnect"]
+						},
+						"description": "Remove the linked LinkedIn account from Unipile."
+					}
+				},
+				{
+					"name": "Unipile OAuth Callback (GET)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/unipile/callback",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "unipile", "callback"]
+						},
+						"description": "OAuth callback endpoint for Unipile LinkedIn integration (GET variant)."
+					}
+				},
+				{
+					"name": "Unipile OAuth Callback (POST)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/unipile/callback",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "unipile", "callback"]
+						},
+						"description": "OAuth callback endpoint for Unipile LinkedIn integration (POST variant)."
+					}
+				}
+			]
+		},
+		{
+			"name": "Twilio",
+			"description": "Twilio messaging: send templates, fetch media, retrieve and send conversation messages.",
+			"item": [
+				{
+					"name": "Send Template Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"body\": \"Hello {{1}}, your appointment is confirmed.\",\n  \"channel\": \"whatsapp\",\n  \"contactId\": \"contact_abc123\",\n  \"to\": \"+447700900123\",\n  \"templateSid\": \"HXa1b2c3d4e5f6g7h8i9j0\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/twilio/send-template",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "twilio", "send-template"]
+						},
+						"description": "Send a pre-approved Twilio template message via the specified channel (e.g. whatsapp, sms)."
+					}
+				},
+				{
+					"name": "Get Media",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/twilio/media/ME1234567890abcdef?messageSid=MM1234567890abcdef&conversationSid={{conversationId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "twilio", "media", "ME1234567890abcdef"],
+							"query": [
+								{
+									"key": "messageSid",
+									"value": "MM1234567890abcdef",
+									"description": "Twilio message SID"
+								},
+								{
+									"key": "conversationSid",
+									"value": "{{conversationId}}",
+									"description": "Twilio conversation SID"
+								}
+							]
+						},
+						"description": "Retrieve media content attached to a Twilio message by media ID."
+					}
+				},
+				{
+					"name": "Get Conversation Messages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/twilio/conversation/{{conversationId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "twilio", "conversation", "{{conversationId}}"]
+						},
+						"description": "Retrieve all messages in a Twilio conversation."
+					}
+				},
+				{
+					"name": "Send Conversation Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"body\": \"Hi there, just following up on your inquiry.\",\n  \"channel\": \"whatsapp\",\n  \"contactId\": \"contact_abc123\",\n  \"to\": \"+447700900123\",\n  \"templateSid\": \"HXa1b2c3d4e5f6g7h8i9j0\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/twilio/conversation/{{conversationId}}/send",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "twilio", "conversation", "{{conversationId}}", "send"]
+						},
+						"description": "Send a message in an existing Twilio conversation. `templateSid` is optional for non-template messages."
+					}
+				}
+			]
+		},
+		{
+			"name": "Training, Templates & Brochure",
+			"description": "Training completion checks, Twilio message templates, and brochure sending.",
+			"item": [
+				{
+					"name": "Check Training Completion",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/training/check-completion?userId={{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "training", "check-completion"],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{userId}}",
+									"description": "User ID to check training status for"
+								}
+							]
+						},
+						"description": "Check whether a user has completed mandatory training modules."
+					}
+				},
+				{
+					"name": "Get Twilio Templates",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/templates",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "templates"]
+						},
+						"description": "Retrieve all available Twilio message templates."
+					}
+				},
+				{
+					"name": "Send Brochure",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lead_id\": \"{{leadId}}\",\n  \"name\": \"John Smith\",\n  \"content\": \"Custom brochure content for the client.\",\n  \"subject\": \"Your Personalized Financial Planning Brochure\",\n  \"brochureType\": \"wealth-management\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/send-brochure",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "send-brochure"]
+						},
+						"description": "Send a brochure email to a lead. `content`, `subject`, and `brochureType` are optional."
+					}
+				}
+			]
+		},
+		{
+			"name": "Email & Contracts",
+			"description": "Email sending, contract management (send, cancel, download).",
+			"item": [
+				{
+					"name": "Send Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"to\": \"client@example.com\",\n  \"subject\": \"Follow-up on Your Consultation\",\n  \"content\": \"<p>Dear Client,</p><p>Thank you for your time today. Please find the summary attached.</p>\",\n  \"leadId\": \"{{leadId}}\",\n  \"conversationId\": \"{{conversationId}}\",\n  \"cc\": [\"manager@company.com\"],\n  \"bcc\": [\"records@company.com\"],\n  \"attachments\": [],\n  \"templateId\": \"tpl_welcome_01\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/send-email",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "send-email"]
+						},
+						"description": "Send an email to a lead. Supports CC, BCC, attachments, and template-based content. `conversationId`, `cc`, `bcc`, `attachments`, and `templateId` are optional."
+					}
+				},
+				{
+					"name": "Send Contract",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"lead_id\": \"{{leadId}}\",\n  \"package_type\": \"premium\",\n  \"name\": \"John Smith\",\n  \"date\": \"2026-04-15\",\n  \"to_email\": \"john.smith@example.com\",\n  \"client\": {\n    \"first_name\": \"John\",\n    \"last_name\": \"Smith\",\n    \"address\": \"123 Main St, London\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/send-contract",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "send-contract"]
+						},
+						"description": "Generate and send a contract to a lead. `name`, `date`, `to_email`, and `client` are optional."
+					}
+				},
+				{
+					"name": "Cancel Contract",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/contracts/contract_abc123/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "contracts", "contract_abc123", "cancel"]
+						},
+						"description": "Cancel an existing contract by its contract ID."
+					}
+				},
+				{
+					"name": "Download Contract PDF",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/contracts/contract_abc123/download",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "contracts", "contract_abc123", "download"]
+						},
+						"description": "Download the PDF version of a contract by its contract ID."
+					}
+				}
+			]
+		},
+		{
+			"name": "TTS & Signed URL",
+			"description": "Text-to-speech services (AWS Polly, Fish.audio) and signed URL generation for ElevenLabs.",
+			"item": [
+				{
+					"name": "AWS Polly Text-to-Speech",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Hello, welcome to our financial planning service.\",\n  \"voiceId\": \"Joanna\",\n  \"outputFormat\": \"mp3\",\n  \"languageCode\": \"en-US\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/polly/text-to-speech",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "polly", "text-to-speech"]
+						},
+						"description": "Convert text to speech using AWS Polly. `voiceId`, `outputFormat`, and `languageCode` are optional with sensible defaults."
+					}
+				},
+				{
+					"name": "Fish.audio Text-to-Speech",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Hello, welcome to our financial planning service.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/fish-audio/text-to-speech",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "fish-audio", "text-to-speech"]
+						},
+						"description": "Convert text to speech using the Fish.audio service."
+					}
+				},
+				{
+					"name": "Get ElevenLabs Signed URL",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/get-signed-url",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "get-signed-url"]
+						},
+						"description": "Generate a signed URL for the ElevenLabs text-to-speech service."
+					}
+				}
+			]
+		},
+		{
+			"name": "Outlook / Calendar",
+			"description": "Microsoft Outlook integration: OAuth flow, calendar management, events, and categories.",
+			"item": [
+				{
+					"name": "Outlook Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/outlook/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "outlook", "status"]
+						},
+						"description": "Check the current Outlook connection status for the authenticated user."
+					}
+				},
+				{
+					"name": "Start Outlook OAuth",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/outlook/connect",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "outlook", "connect"]
+						},
+						"description": "Initiate the Microsoft Outlook OAuth authorization flow."
+					}
+				},
+				{
+					"name": "Outlook OAuth Callback",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/outlook/callback",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "outlook", "callback"]
+						},
+						"description": "OAuth callback endpoint for completing the Outlook authorization flow."
+					}
+				},
+				{
+					"name": "Disconnect Outlook",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/outlook/disconnect",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "outlook", "disconnect"]
+						},
+						"description": "Disconnect the linked Outlook account and revoke tokens."
+					}
+				},
+				{
+					"name": "List Calendars",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/outlook/calendars",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "outlook", "calendars"]
+						},
+						"description": "List all available Outlook calendars for the connected account."
+					}
+				},
+				{
+					"name": "Select Primary Calendar",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"calendarId\": \"AAMkAGI2TGuLAAA=\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/outlook/calendars/select",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "outlook", "calendars", "select"]
+						},
+						"description": "Set a specific calendar as the primary calendar for the CRM integration."
+					}
+				},
+				{
+					"name": "Get Calendar Events",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/outlook/events?start=2026-04-01T00:00:00Z&end=2026-04-30T23:59:59Z&advisorUserId={{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "outlook", "events"],
+							"query": [
+								{
+									"key": "start",
+									"value": "2026-04-01T00:00:00Z",
+									"description": "Start of date range (ISO 8601)"
+								},
+								{
+									"key": "end",
+									"value": "2026-04-30T23:59:59Z",
+									"description": "End of date range (ISO 8601)"
+								},
+								{
+									"key": "advisorUserId",
+									"value": "{{userId}}",
+									"description": "Filter events by advisor user ID"
+								}
+							]
+						},
+						"description": "Retrieve calendar events within a date range. Optionally filter by advisor user ID."
+					}
+				},
+				{
+					"name": "Create Calendar Event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"subject\": \"Initial Consultation - John Smith\",\n  \"start\": \"2026-04-15T10:00:00Z\",\n  \"end\": \"2026-04-15T11:00:00Z\",\n  \"body\": \"Discuss financial planning goals and IHT strategy.\",\n  \"location\": \"Microsoft Teams\",\n  \"attendees\": [\n    {\n      \"emailAddress\": {\n        \"address\": \"john.smith@example.com\",\n        \"name\": \"John Smith\"\n      },\n      \"type\": \"required\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/outlook/events/create",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "outlook", "events", "create"]
+						},
+						"description": "Create a new Outlook calendar event. `body`, `location`, and `attendees` are optional."
+					}
+				},
+				{
+					"name": "Update Event Categories",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categories\": [\"CRM Meeting\", \"High Priority\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/outlook/events/event_abc123/categories",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "outlook", "events", "event_abc123", "categories"]
+						},
+						"description": "Update the categories assigned to a specific Outlook calendar event."
+					}
+				},
+				{
+					"name": "Get Outlook Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/outlook/categories",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "outlook", "categories"]
+						},
+						"description": "Retrieve all available Outlook categories for organizing events."
+					}
+				}
+			]
+		},
+		{
+			"name": "Email OAuth (Contacts)",
+			"description": "Email OAuth connection for syncing contacts.",
+			"item": [
+				{
+					"name": "Init Email OAuth",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/email-connect/init?user_id={{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "email-connect", "init"],
+							"query": [
+								{
+									"key": "user_id",
+									"value": "{{userId}}",
+									"description": "User ID to initiate email OAuth for"
+								}
+							]
+						},
+						"description": "Start the email OAuth flow for a user to connect their email account for contact syncing."
+					}
+				},
+				{
+					"name": "Email OAuth Callback",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/email-connect",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "email-connect"]
+						},
+						"description": "OAuth callback endpoint for completing email account connection."
+					}
+				}
+			]
+		},
+		{
+			"name": "Omnichannel & Messages",
+			"description": "Omnichannel conversations, message history, and LinkedIn messaging threads.",
+			"item": [
+				{
+					"name": "Get Omnichat Conversations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/omnichat/conversations?search=john&channel=whatsapp&limit=20&offset=0&nocache=false",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "omnichat", "conversations"],
+							"query": [
+								{
+									"key": "search",
+									"value": "john",
+									"description": "Search term to filter conversations"
+								},
+								{
+									"key": "channel",
+									"value": "whatsapp",
+									"description": "Filter by channel (whatsapp, sms, email, etc.)"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Number of conversations to return"
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Pagination offset"
+								},
+								{
+									"key": "nocache",
+									"value": "false",
+									"description": "Bypass cache if true"
+								}
+							]
+						},
+						"description": "Retrieve omnichannel conversations with optional search, channel filter, and pagination."
+					}
+				},
+				{
+					"name": "Invalidate Conversation Cache",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pattern\": \"conversations:*\",\n  \"all\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/omnichat/conversations",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "omnichat", "conversations"]
+						},
+						"description": "Invalidate conversation cache. Use `pattern` for selective invalidation or set `all` to `true` to clear everything."
+					}
+				},
+				{
+					"name": "Get Message History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/messages/history?contactEmail=client@example.com&userId={{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "messages", "history"],
+							"query": [
+								{
+									"key": "contactEmail",
+									"value": "client@example.com",
+									"description": "Email of the contact to fetch message history for"
+								},
+								{
+									"key": "userId",
+									"value": "{{userId}}",
+									"description": "Current user ID for context"
+								}
+							]
+						},
+						"description": "Retrieve the full message history for a contact across all channels."
+					}
+				},
+				{
+					"name": "Get LinkedIn Conversations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/linkedin/conversations",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "linkedin", "conversations"]
+						},
+						"description": "Retrieve all LinkedIn conversation threads via the Unipile integration."
+					}
+				}
+			]
+		},
+		{
+			"name": "Leads",
+			"description": "Lead management: search, B2B leads, analytics, advisor assignment, stage updates, and LinkedIn outreach.",
+			"item": [
+				{
+					"name": "Search Leads",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/leads/search?q=smith&limit=10&offset=0",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "leads", "search"],
+							"query": [
+								{
+									"key": "q",
+									"value": "smith",
+									"description": "Search query string"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Maximum results to return"
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Pagination offset"
+								}
+							]
+						},
+						"description": "Search leads by name, email, or other fields."
+					}
+				},
+				{
+					"name": "List B2B Leads",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/leads/b2b",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "leads", "b2b"]
+						},
+						"description": "Retrieve a list of B2B leads with optional filter parameters."
+					}
+				},
+				{
+					"name": "Create B2B Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"company_name\": \"Acme Financial Ltd\",\n  \"contact_name\": \"Jane Doe\",\n  \"email\": \"jane.doe@acmefinancial.com\",\n  \"phone\": \"+447700900456\",\n  \"source\": \"linkedin\",\n  \"notes\": \"Interested in wealth management solutions.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/leads/b2b",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "leads", "b2b"]
+						},
+						"description": "Create a new B2B lead in the system."
+					}
+				},
+				{
+					"name": "B2B Lead Analytics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/leads/b2b/analytics?date_from=2026-03-01&date_to=2026-04-01&advisor_id={{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "leads", "b2b", "analytics"],
+							"query": [
+								{
+									"key": "date_from",
+									"value": "2026-03-01",
+									"description": "Start date for analytics range"
+								},
+								{
+									"key": "date_to",
+									"value": "2026-04-01",
+									"description": "End date for analytics range"
+								},
+								{
+									"key": "advisor_id",
+									"value": "{{userId}}",
+									"description": "Filter by specific advisor"
+								}
+							]
+						},
+						"description": "Retrieve B2B lead analytics and metrics for a given date range and optional advisor filter."
+					}
+				},
+				{
+					"name": "B2B Lookup Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/leads/b2b/lookup?type=industry&search=finance",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "leads", "b2b", "lookup"],
+							"query": [
+								{
+									"key": "type",
+									"value": "industry",
+									"description": "Type of lookup data to retrieve"
+								},
+								{
+									"key": "search",
+									"value": "finance",
+									"description": "Search term within lookup data"
+								}
+							]
+						},
+						"description": "Retrieve lookup data for B2B lead forms (e.g. industry lists, company sizes)."
+					}
+				},
+				{
+					"name": "Bulk Assign Advisor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"advisorId\": \"{{userId}}\",\n  \"leadIds\": [\"lead_001\", \"lead_002\", \"lead_003\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/leads/assign-advisor",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "leads", "assign-advisor"]
+						},
+						"description": "Bulk assign an advisor to multiple leads at once."
+					}
+				},
+				{
+					"name": "Update Lead Stage",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"stage\": \"qualified\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/leads/{{leadId}}/stage",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "leads", "{{leadId}}", "stage"]
+						},
+						"description": "Update the pipeline stage for a specific lead."
+					}
+				},
+				{
+					"name": "Start LinkedIn Outreach",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"profile_url\": \"https://www.linkedin.com/in/johndoe/\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/leads/{{leadId}}/linkedin/start",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "leads", "{{leadId}}", "linkedin", "start"]
+						},
+						"description": "Start a LinkedIn outreach campaign for a lead. `profile_url` is optional if already known."
+					}
+				},
+				{
+					"name": "LinkedIn Connection Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/leads/{{leadId}}/linkedin/connection",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "leads", "{{leadId}}", "linkedin", "connection"]
+						},
+						"description": "Check the LinkedIn connection status for a specific lead."
+					}
+				},
+				{
+					"name": "Get Lead LinkedIn Messages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/leads/{{leadId}}/linkedin/messages",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "leads", "{{leadId}}", "linkedin", "messages"]
+						},
+						"description": "Retrieve LinkedIn messages exchanged with a specific lead."
+					}
+				},
+				{
+					"name": "Send LinkedIn Message to Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Hi John, I'd love to discuss how we can help with your financial planning needs.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/leads/{{leadId}}/linkedin/messages",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "leads", "{{leadId}}", "linkedin", "messages"]
+						},
+						"description": "Send a LinkedIn message to a specific lead."
+					}
+				},
+				{
+					"name": "Bulk Start LinkedIn Outreach",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"leads\": [\n    {\n      \"name\": \"Alice Johnson\",\n      \"linkedin_url\": \"https://www.linkedin.com/in/alicejohnson/\",\n      \"email\": \"alice@example.com\"\n    },\n    {\n      \"name\": \"Bob Williams\",\n      \"linkedin_url\": \"https://www.linkedin.com/in/bobwilliams/\",\n      \"email\": \"bob@example.com\"\n    }\n  ],\n  \"source_lead_id\": \"{{leadId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/leads/linkedin/bulk-start",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "leads", "linkedin", "bulk-start"]
+						},
+						"description": "Start LinkedIn outreach for multiple potential leads in bulk, sourced from an existing lead."
+					}
+				}
+			]
+		},
+		{
+			"name": "Hubstaff",
+			"description": "Hubstaff integration for time tracking: token refresh, screenshots, and activity logs.",
+			"item": [
+				{
+					"name": "Refresh Hubstaff Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"hs_refresh_token_abc123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/hubstaff/refresh-token",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "hubstaff", "refresh-token"]
+						},
+						"description": "Refresh the Hubstaff API access token using a refresh token."
+					}
+				},
+				{
+					"name": "Get Hubstaff Screenshots",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/hubstaff/screenshots?userId={{userId}}&fromDate=2026-04-01&toDate=2026-04-02",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "hubstaff", "screenshots"],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{userId}}",
+									"description": "Hubstaff user ID"
+								},
+								{
+									"key": "fromDate",
+									"value": "2026-04-01",
+									"description": "Start date for screenshot range"
+								},
+								{
+									"key": "toDate",
+									"value": "2026-04-02",
+									"description": "End date for screenshot range"
+								}
+							]
+						},
+						"description": "Retrieve Hubstaff screenshots for a user within a date range."
+					}
+				},
+				{
+					"name": "Get Hubstaff Activity (GET)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/hubstaff/activity",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "hubstaff", "activity"]
+						},
+						"description": "Retrieve Hubstaff activity data (GET variant)."
+					}
+				},
+				{
+					"name": "Hubstaff Activity (POST)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/hubstaff/activity",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "hubstaff", "activity"]
+						},
+						"description": "Submit or query Hubstaff activity data (POST variant)."
+					}
+				}
+			]
+		},
+		{
+			"name": "RingCentral",
+			"description": "RingCentral call log integration.",
+			"item": [
+				{
+					"name": "Get Call Logs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/ringcentral/calls?userId={{userId}}&date=2026-04-01",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "ringcentral", "calls"],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{userId}}",
+									"description": "User ID to fetch call logs for"
+								},
+								{
+									"key": "date",
+									"value": "2026-04-01",
+									"description": "Date to filter call logs"
+								}
+							]
+						},
+						"description": "Retrieve RingCentral call logs for a user on a specific date."
+					}
+				}
+			]
+		},
+		{
+			"name": "Dashboard & Cron",
+			"description": "Dashboard metrics and scheduled cron job endpoints.",
+			"item": [
+				{
+					"name": "Get Dashboard Metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/dashboard-metrics?advisorId={{userId}}&isAdmin=false",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "dashboard-metrics"],
+							"query": [
+								{
+									"key": "advisorId",
+									"value": "{{userId}}",
+									"description": "Advisor user ID for filtering"
+								},
+								{
+									"key": "isAdmin",
+									"value": "false",
+									"description": "Whether the requesting user is an admin"
+								}
+							]
+						},
+						"description": "Retrieve dashboard metrics and KPIs. Admin users see aggregate data; advisors see their own."
+					}
+				},
+				{
+					"name": "Cron - Calculate Dashboard Metrics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"description": "CRON_SECRET or auth token for cron job authentication"
+							},
+							{
+								"key": "x-cron-secret",
+								"value": "your_cron_secret_here",
+								"description": "CRON_SECRET header for authenticating cron requests"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/cron/calculate-dashboard-metrics",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cron", "calculate-dashboard-metrics"]
+						},
+						"description": "Trigger dashboard metrics recalculation. Protected by CRON_SECRET header."
+					}
+				}
+			]
+		},
+		{
+			"name": "Email Notifications",
+			"description": "Email notification management: create, list, clear, and retrieve individual messages.",
+			"item": [
+				{
+					"name": "Create Email Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"leadId\": \"{{leadId}}\",\n  \"userId\": \"{{userId}}\",\n  \"type\": \"new_email\",\n  \"subject\": \"New reply from John Smith\",\n  \"preview\": \"Thanks for the brochure, I'd like to schedule a call...\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/email-notifications",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "email-notifications"]
+						},
+						"description": "Create a new email notification for a user about a lead activity."
+					}
+				},
+				{
+					"name": "List Email Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/email-notifications?leadId={{leadId}}&userId={{userId}}&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "email-notifications"],
+							"query": [
+								{
+									"key": "leadId",
+									"value": "{{leadId}}",
+									"description": "Filter notifications by lead"
+								},
+								{
+									"key": "userId",
+									"value": "{{userId}}",
+									"description": "Filter notifications by user"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Maximum number of notifications to return"
+								}
+							]
+						},
+						"description": "List email notifications with optional filters for lead, user, and result limit."
+					}
+				},
+				{
+					"name": "Clear Email Notifications",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"notificationIds\": [\"notif_001\", \"notif_002\", \"notif_003\"],\n  \"userId\": \"{{userId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/email-notifications",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "email-notifications"]
+						},
+						"description": "Mark email notifications as read/cleared by providing their IDs."
+					}
+				},
+				{
+					"name": "Get Email Message",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/email-message/msg_abc123",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "email-message", "msg_abc123"]
+						},
+						"description": "Retrieve a specific email message by its ID."
+					}
+				}
+			]
+		},
+		{
+			"name": "Candidates",
+			"description": "Candidate (recruitment) management: CRUD operations, communications, notes, messaging, and onboarding.",
+			"item": [
+				{
+					"name": "List Candidates",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates"]
+						},
+						"description": "Retrieve a list of candidates with optional filter parameters."
+					}
+				},
+				{
+					"name": "Create Candidate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"first_name\": \"Sarah\",\n  \"last_name\": \"Connor\",\n  \"email\": \"sarah.connor@example.com\",\n  \"phone\": \"+447700900789\",\n  \"position\": \"Senior Financial Advisor\",\n  \"status\": \"new\",\n  \"recruiter_id\": \"{{userId}}\",\n  \"linkedin_url\": \"https://www.linkedin.com/in/sarahconnor/\",\n  \"notes\": \"Strong candidate with 10 years experience.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates"]
+						},
+						"description": "Create a new candidate record in the recruitment pipeline."
+					}
+				},
+				{
+					"name": "Get Distinct Recruiters",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates/recruiters",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates", "recruiters"]
+						},
+						"description": "Retrieve a list of distinct recruiters who have candidates assigned to them."
+					}
+				},
+				{
+					"name": "Get Positions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates/positions",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates", "positions"]
+						},
+						"description": "Retrieve a list of available positions/roles for candidates."
+					}
+				},
+				{
+					"name": "Get Communication Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates/communication-stats?candidate_ids=cand_001,cand_002,cand_003",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates", "communication-stats"],
+							"query": [
+								{
+									"key": "candidate_ids",
+									"value": "cand_001,cand_002,cand_003",
+									"description": "Comma-separated candidate IDs"
+								}
+							]
+						},
+						"description": "Retrieve communication statistics (message counts, last contact) for specified candidates."
+					}
+				},
+				{
+					"name": "Get Candidate",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates/{{candidateId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates", "{{candidateId}}"]
+						},
+						"description": "Retrieve full details for a specific candidate by ID."
+					}
+				},
+				{
+					"name": "Update Candidate",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"first_name\": \"Sarah\",\n  \"last_name\": \"Connor\",\n  \"email\": \"sarah.connor@newdomain.com\",\n  \"phone\": \"+447700900789\",\n  \"position\": \"Lead Financial Advisor\",\n  \"status\": \"interview_scheduled\",\n  \"notes\": \"Interview scheduled for April 15.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates/{{candidateId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates", "{{candidateId}}"]
+						},
+						"description": "Update an existing candidate's details."
+					}
+				},
+				{
+					"name": "Get Candidate Communications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates/{{candidateId}}/communications",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates", "{{candidateId}}", "communications"]
+						},
+						"description": "Retrieve the communication history for a specific candidate."
+					}
+				},
+				{
+					"name": "Add Candidate Note",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"note\": \"Candidate expressed strong interest in the role. Follow up next week.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates/{{candidateId}}/notes",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates", "{{candidateId}}", "notes"]
+						},
+						"description": "Add a note to a candidate's record."
+					}
+				},
+				{
+					"name": "Send Message to Candidate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"channel\": \"email\",\n  \"message\": \"Dear Sarah, we'd like to invite you for a second interview.\",\n  \"subject\": \"Interview Invitation - Senior Financial Advisor\",\n  \"template_id\": \"tpl_interview_invite\",\n  \"variables\": {\n    \"candidate_name\": \"Sarah Connor\",\n    \"position\": \"Senior Financial Advisor\",\n    \"interview_date\": \"2026-04-20\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates/{{candidateId}}/send-message",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates", "{{candidateId}}", "send-message"]
+						},
+						"description": "Send a message to a candidate via a specified channel (email, whatsapp, sms). `subject`, `template_id`, and `variables` are optional."
+					}
+				},
+				{
+					"name": "Add Candidate to Onboarding",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidates/{{candidateId}}/add-to-onboarding",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidates", "{{candidateId}}", "add-to-onboarding"]
+						},
+						"description": "Move a candidate to the onboarding pipeline after a successful hire."
+					}
+				}
+			]
+		},
+		{
+			"name": "Candidate/Lead Notifications",
+			"description": "Notification polling and creation for candidate and lead message events.",
+			"item": [
+				{
+					"name": "Poll Candidate Message Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/candidate-message-notifications?userId={{userId}}&limit=50",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidate-message-notifications"],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{userId}}",
+									"description": "User ID to poll notifications for"
+								},
+								{
+									"key": "limit",
+									"value": "50",
+									"description": "Maximum number of notifications to return"
+								}
+							]
+						},
+						"description": "Poll for new candidate message notifications for the given user."
+					}
+				},
+				{
+					"name": "Create Candidate Message Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"candidateId\": \"{{candidateId}}\",\n  \"status\": \"unread\",\n  \"messageId\": \"msg_xyz789\",\n  \"timestamp\": \"2026-04-02T14:30:00Z\",\n  \"metadata\": {\n    \"channel\": \"whatsapp\",\n    \"preview\": \"Thanks for the update, looking forward to it!\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/candidate-message-notification",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "candidate-message-notification"]
+						},
+						"description": "Create a new candidate message notification. `metadata` is optional and can include channel, preview text, etc."
+					}
+				}
+			]
+		},
+		{
+			"name": "Advisors & Other",
+			"description": "Advisor follow-up counts, log deletion, and AI email generation.",
+			"item": [
+				{
+					"name": "Get Follow-up Counts (GET)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/advisors/followup-count",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "advisors", "followup-count"]
+						},
+						"description": "Retrieve follow-up counts for advisors (GET variant)."
+					}
+				},
+				{
+					"name": "Follow-up Counts (POST)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/advisors/followup-count",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "advisors", "followup-count"]
+						},
+						"description": "Submit or recalculate follow-up counts for advisors (POST variant)."
+					}
+				},
+				{
+					"name": "Delete Logs",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ids\": [\"log_001\", \"log_002\", \"log_003\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/logs/delete",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "logs", "delete"]
+						},
+						"description": "Delete specific log entries by their IDs."
+					}
+				},
+				{
+					"name": "AI Generate Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"leadId\": \"{{leadId}}\",\n  \"prompt\": \"Write a professional follow-up email after an initial consultation about inheritance tax planning. The client seemed interested in trust structures.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/generate-email",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "generate-email"]
+						},
+						"description": "Generate an AI-composed email based on a prompt and lead/contact context. Use either `leadId` or `contactId`."
+					}
+				}
+			]
+		}
+	]
+}
