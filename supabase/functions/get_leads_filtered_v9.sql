@@ -98,7 +98,13 @@ BEGIN
             AND (p_created_to IS NULL OR l.created_on < p_created_to)
 
             -- PIPELINE STAGE FILTER (new in v9)
-            AND (p_pipeline_stage IS NULL OR array_length(p_pipeline_stage, 1) IS NULL OR l.pipeline_stage = ANY(p_pipeline_stage))
+            -- Cast both sides to text to avoid `text = integer` mismatches
+            -- when environments have pipeline_stage stored as text.
+            AND (
+                p_pipeline_stage IS NULL
+                OR array_length(p_pipeline_stage, 1) IS NULL
+                OR l.pipeline_stage::text = ANY(p_pipeline_stage::text[])
+            )
 
             -- VISIBILITY & ASSIGNMENT
             AND (
