@@ -1,9 +1,6 @@
-export const metadata = {
-  title: "Contacts",
-  viewport: "width=device-width, initial-scale=1", // <-- this is the problem
-}
+import type { Viewport } from 'next'
 
-export const viewport = {
-  width: "device-width",
+export const viewport: Viewport = {
+  width: 'device-width',
   initialScale: 1,
 }
